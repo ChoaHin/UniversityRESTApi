@@ -10,16 +10,11 @@ function SingleStudent(props) {
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/api/student/${studentId}/`)
       .then((response) => response.json())
-      .then((data) => setStudent(data));
-  }, [studentId]);
-
-  useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/module/?student=${studentId}`)
-      .then((response) => response.json())
       .then((data) => {
-        setModules(data);
+        console.log(data);
+        setStudent(data);
       });
-  }, [studentId, setModules]);
+  }, [studentId]);
 
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/api/grade/?student=${studentId}`)
@@ -28,6 +23,17 @@ function SingleStudent(props) {
         setGrades(data);
       });
   }, [studentId, setGrades]);
+
+  useEffect(() => {
+    if (student) {
+      const cohortCode = student.cohort.split("/").slice(-2, -1)[0];
+      fetch(`http://127.0.0.1:8000/api/module/?delivered_to=${cohortCode}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setModules(data);
+        });
+    }
+  }, [student, setModules]);
 
   if (!student) {
     return <div>Loading...</div>;
